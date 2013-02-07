@@ -302,6 +302,11 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      * re-injects a previously queued datagram
      */
     void reinjectQueuedDatagram(const INetworkDatagram * datagram);
+
+    /**
+     * send packet on transportOut gate specified by protocolId
+     */
+    void sendOnTransPortOutGateByProtocolId(cPacket *packet, int protocolId);
 };
 
 #endif
