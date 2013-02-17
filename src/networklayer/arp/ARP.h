@@ -88,7 +88,7 @@ class INET_API ARP : public cSimpleModule, public IARPCache, public ILifecycle
 
     IInterfaceTable *ift;
     IIPv4RoutingTable *rt;  // for answering ProxyARP requests
-    cGate *ipOutGate;
+    cGate *netwOutGate;
 
   public:
     ARP();

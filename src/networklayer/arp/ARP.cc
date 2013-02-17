@@ -94,6 +94,7 @@ void ARP::initialize(int stage)
 
         isUp = isNodeUp();
         ipOutGate = gate("ipOut");
+        netwOutGate = gate("netwOut");
 
         // init statistics
         numRequestsSent = numRepliesSent = 0;
@@ -349,7 +350,7 @@ void ARP::sendPacketToNIC(cMessage *msg, InterfaceEntry *ie, const MACAddress& m
     msg->setControlInfo(controlInfo);
 
     // send out
-    send(msg, ipOutGate);
+    send(msg, netwOutGate);
 }
 
 void ARP::sendARPRequest(InterfaceEntry *ie, IPv4Address ipAddress)

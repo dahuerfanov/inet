@@ -51,6 +51,7 @@ void IPv4::initialize(int stage)
         rt = check_and_cast<IIPv4RoutingTable *>(findModuleWhereverInNode(par("routingTableModuleName"), this));
         arp = ARPCacheAccess().get();
 
+        arpDgramOutGate = gate("arpDgramOut");
         arpInGate = gate("arpIn");
         arpOutGate = gate("arpOut");
         transportInGateBaseId = gateBaseId("transportIn");
@@ -858,7 +859,7 @@ void IPv4::sendDatagramToOutput(IPv4Datagram *datagram, const InterfaceEntry *ie
                 routingDecision->setNextHopAddr(nextHopAddr);
                 datagram->setControlInfo(routingDecision);
 
-                send(datagram, arpOutGate);  // send to ARP for resolution
+                send(datagram, arpDgramOutGate);  // send to ARP for resolution
             }
             else {
                 sendPacketToIeee802NIC(datagram, ie, nextHopMacAddr, ETHERTYPE_IPv4);
