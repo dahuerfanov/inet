@@ -79,6 +79,7 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
     int defaultMCTimeToLive;
     simtime_t fragmentTimeoutTime;
     bool forceBroadcast;
+    bool useProxyARP;
 
     // working vars
     bool isUp;
