@@ -2,7 +2,7 @@ package inet.examples.rtp.shutdownrestart;
 
 import inet.base.LifecycleController;
 import inet.networklayer.autorouting.ipv4.IPv4NetworkConfigurator;
-import inet.transport.rtp.RTPHost;
+import inet.nodes.rtp.RTPHost;
 import inet.world.scenario.ScenarioManager;
 
 
