@@ -47,19 +47,21 @@ module IdealWirelessNic like IWirelessNic
     parameters:
         @display("i=block/ifcard;bgb=214,335;bgl=53");
         double bitrate @unit("bps");
-        string queueType = default("DropTailQueue");    // DropTailQueue, a Diffserv queue, etc.
+        string queueType = default(""); // ~DropTailQueue, or a Diffserv queue; set to "" for use of an internal queue
     gates:
         input upperLayerIn;
         output upperLayerOut;
         input radioIn @labels(IdealAirFrame);
     submodules:
-        queue: <queueType> like IOutputQueue {
+        queue: <queueType> like IOutputQueue  if queueType != "" {
             parameters:
                 @display("p=23,125;q=l2queue");
         }
         mac: IdealWirelessMac {
             parameters:
                 bitrate = bitrate;
+                queueModule = (queueType == "" ? "" : "queue");
+                txQueueLimit = (queueType == "" ? 10000 : 1); // queue sends one packet at a time
                 @display("p=98,207");
         }
         radio: IdealRadio {
@@ -68,9 +70,10 @@ module IdealWirelessNic like IWirelessNic
                 @display("p=98,278");
         }
     connections:
-        upperLayerIn --> { @display("m=n"); } --> queue.in;
+        upperLayerIn --> { @display("m=n"); } --> queue.in if queueType != "";
         mac.upperLayerOut --> { @display("m=n"); } --> upperLayerOut;
-        queue.out --> mac.upperLayerIn;
+        queue.out --> mac.upperLayerIn if queueType != "";
+        upperLayerIn --> { @display("m=n"); } --> mac.upperLayerIn if queueType == "";
         radioIn --> { @display("m=s"); } --> radio.radioIn;
         radio.upperLayerIn <-- mac.lowerLayerOut;
         radio.upperLayerOut --> mac.lowerLayerIn;

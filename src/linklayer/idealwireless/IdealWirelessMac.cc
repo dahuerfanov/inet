@@ -36,9 +36,8 @@ Define_Module(IdealWirelessMac);
 simsignal_t IdealWirelessMac::radioStateSignal = SIMSIGNAL_NULL;
 simsignal_t IdealWirelessMac::dropPkNotForUsSignal = SIMSIGNAL_NULL;
 
-IdealWirelessMac::IdealWirelessMac()
+IdealWirelessMac::IdealWirelessMac() : MacBase()
 {
-    queueModule = NULL;
     radioModule = NULL;
 }
 
@@ -48,12 +47,11 @@ IdealWirelessMac::~IdealWirelessMac()
 
 void IdealWirelessMac::initialize(int stage)
 {
-    WirelessMacBase::initialize(stage);
+    MacBase::initialize(stage);
 
     // all initialization is done in the first stage
     if (stage == 0)
     {
-        outStandingRequests = 0;
         lastTransmitStartTime = -1.0;
 
         bitrate = par("bitrate").doubleValue();
@@ -67,12 +65,6 @@ void IdealWirelessMac::initialize(int stage)
         radioModule = gate("lowerLayerOut")->getPathEndGate()->getOwnerModule();
         IdealRadio *irm = check_and_cast<IdealRadio *>(radioModule);
         irm->subscribe(radioStateSignal, this);
-
-        // find queueModule
-        cGate *queueOut = gate("upperLayerIn")->getPathStartGate();
-        queueModule = dynamic_cast<IPassiveQueue *>(queueOut->getOwnerModule());
-        if (!queueModule)
-            error("Missing queueModule");
 
         initializeMACAddress();
 
@@ -131,6 +123,7 @@ InterfaceEntry *IdealWirelessMac::registerInterface(double datarate)
 
 void IdealWirelessMac::receiveSignal(cComponent *src, simsignal_t id, long x)
 {
+    Enter_Method_Silent();
     if (id == radioStateSignal && src == radioModule)
     {
         radioState = (RadioState::State)x;
@@ -156,18 +149,12 @@ void IdealWirelessMac::handleSelfMsg(cMessage *msg)
 
 void IdealWirelessMac::getNextMsgFromHL()
 {
-    ASSERT(outStandingRequests >= queueModule->getNumPendingRequests());
-    if (outStandingRequests == 0 && lastTransmitStartTime < simTime())
-    {
-        queueModule->requestPacket();
-        outStandingRequests++;
-    }
-    ASSERT(outStandingRequests <= 1);
+    if (!hasOutStandingRequest && lastTransmitStartTime < simTime())
+        requestNextMsgFromUpperQueue();
 }
 
-void IdealWirelessMac::handleUpperMsg(cPacket *msg)
+void IdealWirelessMac::handleMsgFromUpperQueue(cMessage *msg)
 {
-    outStandingRequests--;
     if (radioState == RadioState::TRANSMIT)
     {
         // Logic error: we do not request packet from the external queue when radio is transmitting
@@ -176,21 +163,17 @@ void IdealWirelessMac::handleUpperMsg(cPacket *msg)
     else if (radioState == RadioState::SLEEP)
     {
         EV << "Dropped upper layer message " << msg << " because radio is SLEEPing.\n";
+        getNextMsgFromHL();
     }
     else
     {
         // We are idle, so we can start transmitting right away.
         EV << "Received " << msg << " for transmission\n";
-        startTransmitting(msg);
+        startTransmitting(PK(msg));
     }
 }
 
-void IdealWirelessMac::handleCommand(cMessage *msg)
-{
-    error("Unexpected command received from higher layer");
-}
-
-void IdealWirelessMac::handleLowerMsg(cPacket *msg)
+void IdealWirelessMac::handleMsgFromLL(cMessage *msg)
 {
     IdealWirelessFrame *frame = check_and_cast<IdealWirelessFrame *>(msg);
     if (frame->hasBitError())

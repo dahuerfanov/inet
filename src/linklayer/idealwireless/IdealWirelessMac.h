@@ -25,7 +25,7 @@
 
 #include "MACAddress.h"
 #include "RadioState.h"
-#include "WirelessMacBase.h"
+#include "MacBase.h"
 
 class IdealWirelessFrame;
 class InterfaceEntry;
@@ -36,7 +36,7 @@ class IPassiveQueue;
  *
  * See the NED file for details.
  */
-class INET_API IdealWirelessMac : public WirelessMacBase, public cListener
+class INET_API IdealWirelessMac : public MacBase, public cListener
 {
   protected:
     static simsignal_t radioStateSignal;
@@ -48,13 +48,11 @@ class INET_API IdealWirelessMac : public WirelessMacBase, public cListener
     bool promiscuous;       // promiscuous mode
     MACAddress address;     // MAC address
 
-    IPassiveQueue *queueModule;
     cModule *radioModule;
 
     InterfaceEntry *interfaceEntry;  // points into IInterfaceTable
 
     RadioState::State radioState;
-    int outStandingRequests;
     simtime_t lastTransmitStartTime;
 
   protected:
@@ -71,12 +69,11 @@ class INET_API IdealWirelessMac : public WirelessMacBase, public cListener
     //cListener:
     virtual void receiveSignal(cComponent *src, simsignal_t id, long x);
 
-    /** implements WirelessMacBase functions */
+    /** implements MacBase functions */
     //@{
     virtual void handleSelfMsg(cMessage *msg);
-    virtual void handleUpperMsg(cPacket *msg);
-    virtual void handleCommand(cMessage *msg);
-    virtual void handleLowerMsg(cPacket *msg);
+    virtual void handleMsgFromUpperQueue(cMessage *msg);
+    virtual void handleMsgFromLL(cMessage *msg);
     //@}
 
   public:

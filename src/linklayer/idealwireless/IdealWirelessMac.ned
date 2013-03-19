@@ -40,6 +40,8 @@ simple IdealWirelessMac
         double bitrate @unit("bps");
         int mtu @unit("B") = default(4470B);
         int headerLength @unit("B");        // IdealWirelessFrame.byteLength = headerLength + packetFromUpperLayer.byteLength
+        string queueModule = default("");   // name of optional external queue module
+        int txQueueLimit = default(1000);   // maximum number of frames queued up for transmission in the internal queue (only used if queueModule==""); additional frames cause a runtime error
         bool promiscuous = default(false);
         @display("i=block/rxtx");
 
