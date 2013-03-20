@@ -1,24 +1,22 @@
-/* -*- mode:c++ -*- ********************************************************
- * file:        MacBase.h
- *
- * derived by Andras Varga using decremental programming from BasicMacLayer.h,
- * which had the following copyright:
- *
- * author:      Daniel Willkomm
- *
- * copyright:   (C) 2004 Telecommunication Networks Group (TKN) at
- *              Technische Universitaet Berlin, Germany.
- *
- *              This program is free software; you can redistribute it
- *              and/or modify it under the terms of the GNU Lesser General Public
- *              License as published by the Free Software Foundation; either
- *              version 2 of the License, or (at your option) any later
- *              version.
- *              For further information see file COPYING
- *              in the top level directory
- ***************************************************************************
- * part of:     framework implementation developed by tkn
- **************************************************************************/
+//
+// Copyright (C) 2013 OpenSim Ltd.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+// author: Zoltan Bojthe (zbojthe@omnetpp.org)
+//
 
 
 #ifndef __INET_MACBASE_H
@@ -32,13 +30,11 @@ class IPassiveQueue;
 
 /**
  * Base class for MAC protocols.
- *
- * @author Zoltan Bojthe
  */
 class INET_API MacBase : public cSimpleModule
 {
   protected:
-    /** @brief gate id*/
+    /** gate id*/
     //@{
     int upperLayerIn;
     int upperLayerOut;
@@ -47,23 +43,29 @@ class INET_API MacBase : public cSimpleModule
     //@}
 
     IPassiveQueue *externalQueue;
-    cQueue innerQueue;
+    cQueue innerQueue;   //XXX miert nem cPacketQueue?
     int queueLimit;               // max length of innerQueue
-    bool hasOutStandingRequest;
+    bool hasOutStandingRequest;   //XXX biztos hogy kell?
 
     //TODO rename variable, TRANSLATE
     // azt jelzi, hogy a handleMessage vagy processRequestPackets fuggvenyekben belul vagyunk-e:
     //  - ha igen, akkor innerqueue eseten eleeg beallitani a flag-et, hogy kerunk csomagot.
     //  - ha nem, akkor meg kell hivni utana a processRequestPackets fuggvenyt is.
-    bool inside;
+    bool inside;     //XXX ilyenre nem szabad hogy szukseg legyen!
 
     static simsignal_t packetSentToLowerSignal;         // at start of transmit
     static simsignal_t packetReceivedFromLowerSignal;
     static simsignal_t packetSentToUpperSignal;         // at start of transmit
     static simsignal_t packetReceivedFromUpperSignal;
 
+  private:
+    void processRequestedPackets();   //XXX valszeg nem kell
+    void pushMsgToInnerQueue(cMessage *msg);
+    void requestNextMsgFromUpperQueue();   //XXX rename: requestNextMessage
+
   public:
     MacBase() { externalQueue = NULL; hasOutStandingRequest = false; }
+
   protected:
     /**
      * Initialization of the module and some variables.
@@ -72,40 +74,33 @@ class INET_API MacBase : public cSimpleModule
      */
     virtual void initialize(int);
 
-    /** @brief Called every time a message arrives*/
-    virtual void handleMessage(cMessage *msg);
-
-  private:
-    void processRequestedPackets();
-    void pushMsgToInnerQueue(cMessage *msg);
-
-  protected:
     virtual void initializeQueueModule();
 
+    virtual void handleMessage(cMessage *msg);
+
     /**
-     * @name Handle Messages
-     * @brief Functions to redefine by the programmer
+     * Returns a packet from the queue, or NULL if none is available
      */
+    virtual cPacket *getPacketFromQueue();
+
+    /** @name Functions to redefine in subclasses */
     //@{
-    /** @brief Handle self messages such as timers */
+    /** Handle self messages such as timers */
     virtual void handleSelfMsg(cMessage *msg) = 0;
 
-    /** @brief Handle messages from upper layer queue */
+    /** Handle messages from upper layer queue */
     virtual void handleMsgFromUpperQueue(cMessage *msg) = 0;
 
     /** Handle packets from lower layer */
-    virtual void handleMsgFromLL(cMessage *msg) = 0;
+    virtual void handleMsgFromLL(cMessage *msg) = 0;  //XXX rename: ...FromLowerLayer
     //@}
-
-    /** @brief Request a packet from upper layer queue */
-    virtual void requestNextMsgFromUpperQueue();
 
     /** @name Convenience Functions*/
     //@{
-    /** @brief Sends a message to the lower layer */
+    /** Sends a message to the lower layer */
     virtual void sendDown(cMessage *msg);
 
-    /** @brief Sends a message to the upper layer */
+    /** Sends a message to the upper layer */
     virtual void sendUp(cMessage *msg);
     //@}
 };

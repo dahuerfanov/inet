@@ -1,25 +1,22 @@
-/***************************************************************************
- * file:        MacBase.cc
- *
- * derived by Andras Varga using decremental programming from BasicMacLayer.cc,
- * which had the following copyright:
- *
- * author:      Daniel Willkomm
- *
- * copyright:   (C) 2004 Telecommunication Networks Group (TKN) at
- *              Technische Universitaet Berlin, Germany.
- *
- *              This program is free software; you can redistribute it
- *              and/or modify it under the terms of the GNU Lesser General Public
- *              License as published by the Free Software Foundation; either
- *              version 2 of the License, or (at your option) any later
- *              version.
- *              For further information see file COPYING
- *              in the top level directory
- ***************************************************************************
- * part of:     framework implementation developed by tkn
- **************************************************************************/
-
+//
+// Copyright (C) 2013 OpenSim Ltd.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+// author: Zoltan Bojthe (zbojthe@omnetpp.org)
+//
 
 #include "MacBase.h"
 #include "IPassiveQueue.h"
@@ -76,7 +73,7 @@ void MacBase::initializeQueueModule()
 
 void MacBase::handleMessage(cMessage *msg)
 {
-    inside = true;
+    inside = true;   //XXX ilyennek nem szabad lennie
 
     if (msg->isSelfMessage())
     {
@@ -90,7 +87,7 @@ void MacBase::handleMessage(cMessage *msg)
         if (externalQueue)
         {
             hasOutStandingRequest = (externalQueue->getNumPendingRequests() > 0);
-            handleMsgFromUpperQueue(msg);
+            handleMsgFromUpperQueue(msg);   //XXX
         }
         else
             pushMsgToInnerQueue(msg);
@@ -105,7 +102,7 @@ void MacBase::handleMessage(cMessage *msg)
 
     inside = false;
 
-    processRequestedPackets();
+    processRequestedPackets();  //XXX ????
 }
 
 
@@ -119,7 +116,8 @@ void MacBase::pushMsgToInnerQueue(cMessage *msg)
     innerQueue.insert(msg);
 }
 
-void MacBase::processRequestedPackets()
+
+void MacBase::processRequestedPackets()   //XXX na ilyennek egyaltalan nem kellene lennie!
 {
     if (!inside && !externalQueue)
     {
@@ -130,13 +128,13 @@ void MacBase::processRequestedPackets()
             hasOutStandingRequest = false;
             cObject *msg = innerQueue.pop();
             if (msg)
-                handleMsgFromUpperQueue(check_and_cast<cMessage *>(msg));
+                handleMsgFromUpperQueue(check_and_cast<cMessage *>(msg)); //???? siman return msg!!!
         }
         inside = false;
     }
 }
 
-void MacBase::requestNextMsgFromUpperQueue()
+void MacBase::requestNextMsgFromUpperQueue() //XXX ilyen nem kellene????
 {
     if (hasOutStandingRequest)
         throw cRuntimeError("Model error: already has an outstanding request");
@@ -147,6 +145,23 @@ void MacBase::requestNextMsgFromUpperQueue()
     else
         processRequestedPackets();
 }
+
+cPacket *MacBase::getPacketFromQueue()  //XXX ez lenne a fenti helyett
+{
+    if (externalQueue) 
+    {
+        ASSERT(innerQueue.isEmpty());
+        externalQueue->requestPacket();
+        return NULL;
+    }
+    else
+    {
+        cObject *msg = innerQueue.pop();
+        ASSERT(!msg || dynamic_cast<cPacket*>(msg));
+        return (cPacket*)msg;
+    }
+}
+
 
 void MacBase::sendDown(cMessage *msg)
 {
