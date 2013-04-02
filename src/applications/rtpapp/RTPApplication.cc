@@ -61,13 +61,13 @@ void RTPApplication::initialize(int stage)
     _transmissionStopDelay = par("transmissionStopDelay");
     _sessionLeaveDelay = par("sessionLeaveDelay");
 
-    ev << "commonName" << _commonName << endl;
-    ev << "profileName" << _profileName << endl;
-    ev << "bandwidth" << _bandwidth << endl;
-    ev << "destinationAddress" << _destinationAddress << endl;
-    ev << "portNumber" << _port << endl;
-    ev << "fileName" << _fileName << endl;
-    ev << "payloadType" << _payloadType << endl;
+    EV << "commonName" << _commonName << endl;
+    EV << "profileName" << _profileName << endl;
+    EV << "bandwidth" << _bandwidth << endl;
+    EV << "destinationAddress" << _destinationAddress << endl;
+    EV << "portNumber" << _port << endl;
+    EV << "fileName" << _fileName << endl;
+    EV << "payloadType" << _payloadType << endl;
 
     ssrc = 0;
     isActiveSession = false;
@@ -82,10 +82,10 @@ void RTPApplication::handleMessage(cMessage* msgIn)
         switch (msgIn->getKind())
         {
         case ENTER_SESSION:
-            ev << "enterSession" << endl;
+            EV << "enterSession" << endl;
             if (isActiveSession)
             {
-                ev << "Session already entered\n";
+                EV << "Session already entered\n";
             }
             else
             {
@@ -103,10 +103,10 @@ void RTPApplication::handleMessage(cMessage* msgIn)
             break;
 
         case START_TRANSMISSION:
-            ev << "startTransmission" << endl;
+            EV << "startTransmission" << endl;
             if (!isActiveSession)
             {
-                ev << "Session already left\n";
+                EV << "Session already left\n";
             }
             else
             {
@@ -123,10 +123,10 @@ void RTPApplication::handleMessage(cMessage* msgIn)
             break;
 
         case STOP_TRANSMISSION:
-            ev << "stopTransmission" << endl;
+            EV << "stopTransmission" << endl;
             if (!isActiveSession)
             {
-                ev << "Session already left\n";
+                EV << "Session already left\n";
             }
             else
             {
@@ -140,10 +140,10 @@ void RTPApplication::handleMessage(cMessage* msgIn)
             break;
 
         case LEAVE_SESSION:
-            ev << "leaveSession" << endl;
+            EV << "leaveSession" << endl;
             if (!isActiveSession)
             {
-                ev << "Session already left\n";
+                EV << "Session already left\n";
             }
             else
             {
@@ -170,11 +170,11 @@ void RTPApplication::handleMessage(cMessage* msgIn)
             {
             case RTP_IFP_SESSION_ENTERED:
                 {
-                    ev << "Session Entered" << endl;
+                    EV << "Session Entered" << endl;
                     ssrc = (check_and_cast<RTPCISessionEntered *>(ci))->getSsrc();
                     if (opp_strcmp(_fileName, ""))
                     {
-                        ev << "CreateSenderModule" << endl;
+                        EV << "CreateSenderModule" << endl;
                         RTPCICreateSenderModule* ci = new RTPCICreateSenderModule();
                         ci->setSsrc(ssrc);
                         ci->setPayloadType(_payloadType);
@@ -186,7 +186,7 @@ void RTPApplication::handleMessage(cMessage* msgIn)
                     else
                     {
                         cMessage *selfMsg = new cMessage("leaveSession", LEAVE_SESSION);
-                        ev << "Receiver Module : leaveSession" << endl;
+                        EV << "Receiver Module : leaveSession" << endl;
                         scheduleAt(simTime() + _sessionLeaveDelay, selfMsg);
                     }
                 }
@@ -194,7 +194,7 @@ void RTPApplication::handleMessage(cMessage* msgIn)
 
             case RTP_IFP_SENDER_MODULE_CREATED:
                 {
-                    ev << "Sender Module Created" << endl;
+                    EV << "Sender Module Created" << endl;
                     cMessage *selfMsg = new cMessage("startTransmission", START_TRANSMISSION);
                     scheduleAt(simTime() + _transmissionStartDelay, selfMsg);
                 }
@@ -207,17 +207,17 @@ void RTPApplication::handleMessage(cMessage* msgIn)
                     switch (rsim->getStatus())
                     {
                     case RTP_SENDER_STATUS_PLAYING:
-                        ev << "PLAYING" << endl;
+                        EV << "PLAYING" << endl;
                         break;
 
                     case RTP_SENDER_STATUS_FINISHED:
-                        ev << "FINISHED" << endl;
+                        EV << "FINISHED" << endl;
                         selfMsg = new cMessage("leaveSession", LEAVE_SESSION);
                         scheduleAt(simTime() + _sessionLeaveDelay, selfMsg);
                         break;
 
                     case RTP_SENDER_STATUS_STOPPED:
-                        ev << "STOPPED" << endl;
+                        EV << "STOPPED" << endl;
                         selfMsg = new cMessage("leaveSession", LEAVE_SESSION);
                         scheduleAt(simTime() + _sessionLeaveDelay, selfMsg);
                         break;
@@ -230,13 +230,13 @@ void RTPApplication::handleMessage(cMessage* msgIn)
 
             case RTP_IFP_SESSION_LEFT:
                 if (!isActiveSession)
-                    ev << "Session already left\n";
+                    EV << "Session already left\n";
                 else
                     isActiveSession = false;
                 break;
 
             case RTP_IFP_SENDER_MODULE_DELETED:
-                ev << "Sender Module Deleted" << endl;
+                EV << "Sender Module Deleted" << endl;
                 break;
 
             default:

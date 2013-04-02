@@ -125,9 +125,9 @@ void SCTPClient::connect()
     outStreams = par("outboundStreams");
     socket.setInboundStreams(inStreams);
     socket.setOutboundStreams(outStreams);
-    ev << "issuing OPEN command\n";
+    EV << "issuing OPEN command\n";
     setStatusString("connecting");
-    ev << "connect to address " << connectAddress << "\n";
+    EV << "connect to address " << connectAddress << "\n";
     socket.connect(AddressResolver().resolve(connectAddress, 1), connectPort, (uint32)par("numRequestsPerSession"));
     numSessions++;
 }
@@ -148,7 +148,7 @@ void SCTPClient::setStatusString(const char *s)
 void SCTPClient::socketEstablished(int32, void *, uint64 buffer )
 {
     int32 count = 0;
-    ev << "SCTPClient: connected\n";
+    EV << "SCTPClient: connected\n";
     setStatusString("connected");
     bufferSize = buffer;
     // determine number of requests in this session
@@ -347,7 +347,7 @@ void SCTPClient::handleTimer(cMessage *msg)
     switch (msg->getKind())
     {
         case MSGKIND_CONNECT:
-            ev << "starting session call connect\n";
+            EV << "starting session call connect\n";
             connect();
             break;
 
@@ -415,7 +415,7 @@ void SCTPClient::handleTimer(cMessage *msg)
             break;
 
         default:
-            ev << "MsgKind =" << msg->getKind() << " unknown\n";
+            EV << "MsgKind =" << msg->getKind() << " unknown\n";
             break;
     }
 }
@@ -452,7 +452,7 @@ void SCTPClient::socketPeerClosed(int32, void *)
     // close the connection (if not already closed)
     if (socket.getState() == SCTPSocket::PEER_CLOSED)
     {
-        ev << "remote SCTP closed, closing here as well\n";
+        EV << "remote SCTP closed, closing here as well\n";
         close();
     }
 }
@@ -460,7 +460,7 @@ void SCTPClient::socketPeerClosed(int32, void *)
 void SCTPClient::socketClosed(int32, void *)
 {
     // *redefine* to start another session etc.
-    ev << "connection closed\n";
+    EV << "connection closed\n";
     setStatusString("closed");
 
     if (primaryChangeTimer)
@@ -474,7 +474,7 @@ void SCTPClient::socketClosed(int32, void *)
 void SCTPClient::socketFailure(int32, void *, int32 code)
 {
     // subclasses may override this function, and add code try to reconnect after a delay.
-    ev << "connection broken\n";
+    EV << "connection broken\n";
     setStatusString("broken");
     numBroken++;
     // reconnect after a delay
@@ -590,9 +590,9 @@ void SCTPClient::finish()
         primaryChangeTimer = NULL;
     }
 
-    ev << getFullPath() << ": opened " << numSessions << " sessions\n";
-    ev << getFullPath() << ": sent " << bytesSent << " bytes in " << packetsSent << " packets\n";
-    ev << getFullPath() << ": received " << bytesRcvd << " bytes in " << packetsRcvd << " packets\n";
+    EV << getFullPath() << ": opened " << numSessions << " sessions\n";
+    EV << getFullPath() << ": sent " << bytesSent << " bytes in " << packetsSent << " packets\n";
+    EV << getFullPath() << ": received " << bytesRcvd << " bytes in " << packetsRcvd << " packets\n";
     sctpEV3 << "Client finished\n";
 }
 
