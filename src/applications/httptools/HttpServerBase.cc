@@ -33,8 +33,6 @@
 
 void HttpServerBase::initialize()
 {
-    ll = par("logLevel");
-
     EV_DEBUG << "Initializing server component\n";
 
     hostName = (const char*)par("hostName");
@@ -151,10 +149,10 @@ void HttpServerBase::initialize()
 
 void HttpServerBase::finish()
 {
-    EV_SUMMARY << "HTML documents served " << htmlDocsServed << "\n";
-    EV_SUMMARY << "Image resources served " << imgResourcesServed << "\n";
-    EV_SUMMARY << "Text resources served " << textResourcesServed << "\n";
-    EV_SUMMARY << "Bad requests " << badRequests << "\n";
+    EV_INFO << "HTML documents served " << htmlDocsServed << "\n";
+    EV_INFO << "Image resources served " << imgResourcesServed << "\n";
+    EV_INFO << "Text resources served " << textResourcesServed << "\n";
+    EV_INFO << "Bad requests " << badRequests << "\n";
 
     recordScalar("HTML.served", htmlDocsServed);
     recordScalar("images.served", imgResourcesServed);
