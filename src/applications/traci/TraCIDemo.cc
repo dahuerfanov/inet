@@ -28,8 +28,6 @@ Define_Module(TraCIDemo);
 void TraCIDemo::initialize(int stage) {
     cSimpleModule::initialize(stage);
     if (stage == 3) {
-        debug = par("debug");
-
         mobilityStateChangedSignal = registerSignal("mobilityStateChanged");
         traci = TraCIMobilityAccess().get();
         traci->subscribe(mobilityStateChangedSignal, this);

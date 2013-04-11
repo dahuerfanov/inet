@@ -45,7 +45,6 @@ class TraCIDemo : public cSimpleModule, protected cListener, public ILifecycle
         virtual void handleMessage(cMessage* msg);
 
     protected:
-        bool debug;
         TraCIMobility* traci;
         bool sentMessage;
         UDPSocket socket;
