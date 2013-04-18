@@ -19,8 +19,8 @@
 #define __INET_ETHERAPPSRV_H
 
 #include "INETDefs.h"
-
 #include "MACAddress.h"
+#include "ILifecycle.h"
 
 #define MAX_REPLY_CHUNK_SIZE   1497
 
@@ -28,7 +28,7 @@
 /**
  * Server-side process EtherAppCli.
  */
-class INET_API EtherAppSrv : public cSimpleModule
+class INET_API EtherAppSrv : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     int localSAP;
