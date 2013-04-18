@@ -16,8 +16,8 @@
 //
 
 #include "INETDefs.h"
-
 #include "IPvXAddress.h"
+#include "ILifecycle.h"
 
 class PingPayload;
 
@@ -30,7 +30,7 @@ class PingPayload;
  *
  * See NED file for detailed description of operation.
  */
-class INET_API PingTestApp : public cSimpleModule
+class INET_API PingTestApp : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     virtual void initialize();
