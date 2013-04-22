@@ -31,7 +31,10 @@ out/
 *.manifest
 .tkenvrc
 .tkenvlog
+.cmdenv-log
+netanim-trace.txt
 *.out
+gcc-debug
 
 # ignore backup and temp files
 *.bak
