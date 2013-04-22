@@ -188,7 +188,7 @@ void UDPBasicBurst::processStart()
 
 void UDPBasicBurst::processSend()
 {
-    if (stopTime <= 0 || simTime() < stopTime)
+    if (stopTime == -1 || simTime() < stopTime)
     {
         // send and reschedule next sending
         if (isSource) // if the node is a sink, don't generate messages
@@ -331,7 +331,7 @@ void UDPBasicBurst::generateBurst()
     if (activeBurst && nextPkt >= nextSleep)
         nextPkt = nextBurst;
 
-    if (stopTime > 0 && nextPkt > stopTime)
+    if (stopTime != -1 && nextPkt > stopTime)
     {
         timerNext->setKind(STOP);
         nextPkt = stopTime;
