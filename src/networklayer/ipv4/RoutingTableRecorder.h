@@ -18,10 +18,11 @@
 #ifndef __ROUTINGTABLERECORDER_H
 #define __ROUTINGTABLERECORDER_H
 
+#include "INETDefs.h"
+
 #if OMNETPP_VERSION >= 0x0500  /* cEventlogListener is only supported from 5.0 */
 
 #include <map>
-#include "INETDefs.h"
 #include "IIPv4RoutingTable.h"
 #include "INotifiable.h"
 #include "IRoute.h"

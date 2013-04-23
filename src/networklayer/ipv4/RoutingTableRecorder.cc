@@ -15,6 +15,8 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
+#include "INETDefs.h"
+
 #if OMNETPP_VERSION >= 0x0500  /* cEventlogListener is only supported from 5.0 */
 
 #include "NotifierConsts.h"
