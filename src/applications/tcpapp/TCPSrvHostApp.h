@@ -15,10 +15,9 @@
 #define __INET_TCPSRVHOSTAPP_H
 
 #include "INETDefs.h"
-
 #include "TCPSocket.h"
 #include "TCPSocketMap.h"
-
+#include "ILifecycle.h"
 
 //forward declaration:
 class TCPServerThreadBase;
@@ -28,7 +27,7 @@ class TCPServerThreadBase;
  * is a sSimpleModule). Creates one instance (using dynamic module creation)
  * for each incoming connection. More info in the corresponding NED file.
  */
-class INET_API TCPSrvHostApp : public cSimpleModule
+class INET_API TCPSrvHostApp : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     TCPSocket serverSocket;

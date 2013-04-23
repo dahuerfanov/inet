@@ -15,13 +15,13 @@
 #define __INET_TCPSINKAPP_H
 
 #include "INETDefs.h"
-
+#include "ILifecycle.h"
 
 /**
  * Accepts any number of incoming connections, and discards whatever arrives
  * on them.
  */
-class INET_API TCPSinkApp : public cSimpleModule
+class INET_API TCPSinkApp : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     long bytesRcvd;

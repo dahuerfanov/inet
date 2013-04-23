@@ -15,7 +15,7 @@
 #define __INET_TCPGENERICSRVAPP_H
 
 #include "INETDefs.h"
-
+#include "ILifecycle.h"
 
 /**
  * Generic server application. It serves requests coming in GenericAppMsg
@@ -23,7 +23,7 @@
  *
  * @see GenericAppMsg, TCPGenericCliAppBase
  */
-class INET_API TCPGenericSrvApp : public cSimpleModule
+class INET_API TCPGenericSrvApp : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     simtime_t delay;

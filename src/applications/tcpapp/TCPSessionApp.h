@@ -17,14 +17,13 @@
 #include <vector>
 
 #include "INETDefs.h"
-
 #include "TCPSocket.h"
-
+#include "ILifecycle.h"
 
 /**
  * Single-connection TCP application.
  */
-class INET_API TCPSessionApp : public cSimpleModule
+class INET_API TCPSessionApp : public cSimpleModule, public LifecycleNotSupported
 {
   protected:
     struct Command

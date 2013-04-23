@@ -15,12 +15,12 @@
 #define __INET_TELNETAPP_H
 
 #include "TCPGenericCliAppBase.h"
-
+#include "ILifecycle.h"
 
 /**
  * An example Telnet client application. The server app should be TCPGenericSrvApp.
  */
-class INET_API TelnetApp : public TCPGenericCliAppBase
+class INET_API TelnetApp : public TCPGenericCliAppBase, public LifecycleNotSupported
 {
   protected:
     cMessage *timeoutMsg;
