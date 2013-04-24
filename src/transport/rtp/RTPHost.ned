@@ -3,18 +3,12 @@
 package inet.transport.rtp;
 
 import inet.applications.rtpapp.RTPApplication;
-import inet.base.NotificationBoard;
-import inet.linklayer.IWiredNic;
-import inet.networklayer.common.InterfaceTable;
-import inet.networklayer.ipv4.RoutingTable;
-import inet.nodes.inet.NetworkLayer;
-import inet.nodes.inet.NodeBase;
-import inet.status.NodeStatus;
+import inet.nodes.inet.StandardHost;
 import inet.transport.udp.UDP;
 import ned.IdealChannel;
 
 
-module RTPHost extends NodeBase
+module RTPHost extends StandardHost
 {
     parameters:
         string profileName;
@@ -23,11 +17,12 @@ module RTPHost extends NodeBase
         double bandwidth;
         string fileName;
         int payloadType;
+        hasUdp = true;
         // network information
         @display("i=device/pc2");
 
     submodules:
-        application: RTPApplication {
+        rtpApp: RTPApplication {
             parameters:
                 profileName = profileName;
                 destinationAddress = destinationAddress;
@@ -35,32 +30,25 @@ module RTPHost extends NodeBase
                 bandwidth = bandwidth;
                 fileName = fileName;
                 payloadType = payloadType;
-                @display("p=286,43");
+                @display("p=254,42");
         }
         rtp: RTP {
-            @display("p=288,111");
+            @display("p=254,111");
         }
         rtcp: RTCP {
-            @display("p=368,111");
-        }
-        udp: UDP {
-            parameters:
-                @display("p=327,180");
-            gates:
-                appIn[2];
-                appOut[2];
+            @display("p=391,111");
         }
 
     connections allowunconnected:
         // transport connections
-        application.rtpOut --> rtp.appIn;
-        application.rtpIn <-- rtp.appOut;
+        rtpApp.rtpOut --> rtp.appIn;
+        rtpApp.rtpIn <-- rtp.appOut;
 
-        rtp.udpOut --> udp.appIn[0];
-        rtp.udpIn <-- udp.appOut[0];
+        rtp.udpOut --> udp.appIn++;
+        rtp.udpIn <-- udp.appOut++;
 
-        rtcp.udpOut --> udp.appIn[1];
-        rtcp.udpIn <-- udp.appOut[1];
+        rtcp.udpOut --> udp.appIn++;
+        rtcp.udpIn <-- udp.appOut++;
 
         networkLayer.udpOut --> udp.ipIn;
         networkLayer.udpIn <-- udp.ipOut;
