@@ -28,7 +28,6 @@
 #include "InterfaceTableAccess.h"
 #include "IPv4InterfaceData.h"
 #include "IPv4Route.h"
-#include "IPv4NetworkConfigurator.h"
 #include "NotificationBoard.h"
 #include "NotifierConsts.h"
 #include "RoutingTableParser.h"
@@ -866,14 +865,9 @@ bool RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage
     Enter_Method_Silent();
     if (dynamic_cast<NodeStartOperation *>(operation)) {
         if (stage == NodeStartOperation::STAGE_NETWORK_LAYER) {
-            // KLUDGE: TODO: move or what?
-            IPv4NetworkConfigurator *configurator = dynamic_cast<IPv4NetworkConfigurator *>(findModuleWherever("configurator", simulation.getSystemModule()));
             for (int i=0; i<ift->getNumInterfaces(); ++i) {
                 InterfaceEntry *ie = ift->getInterface(i);
                 configureInterfaceForIPv4(ie);
-                // KLUDGE: TODO: move or what?
-                if (configurator)
-                    configurator->configureInterface(ie);
             }
             configureLoopbackForIPv4();
             RoutingTableParser parser(ift, this);
@@ -881,9 +875,6 @@ bool RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage
             if (*filename && parser.readRoutingTableFromFile(filename)==-1)
                 error("Error reading routing table file %s", filename);
             configureRouterId();
-            // KLUDGE: TODO: move or what?
-            if (configurator)
-                configurator->configureRoutingTable(this);
             updateNetmaskRoutes();
         }
     }

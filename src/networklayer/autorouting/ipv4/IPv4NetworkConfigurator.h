@@ -21,6 +21,7 @@
 #ifndef __INET_IPV4CONFIGURATOR_H
 #define __INET_IPV4CONFIGURATOR_H
 
+#include <algorithm>
 #include <omnetpp.h>
 #include "INETDefs.h"
 #include "Topology.h"

@@ -22,6 +22,7 @@ import inet.linklayer.IExternalNic;
 import inet.linklayer.IWiredNic;
 import inet.linklayer.IWirelessNic;
 import inet.mobility.IMobility;
+import inet.networklayer.autorouting.ipv4.IPv4NodeConfigurator;
 import inet.networklayer.common.InterfaceTable;
 import inet.networklayer.ipv4.RoutingTable;
 import inet.status.NodeStatus;
@@ -59,6 +60,8 @@ module NodeBase
         status: NodeStatus if hasStatus {
             @display("p=50,50");
         }
+
+        nodeConfigurator: IPv4NodeConfigurator;
 
         notificationBoard: NotificationBoard {
             parameters:
