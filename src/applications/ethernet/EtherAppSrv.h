@@ -21,6 +21,7 @@
 #include "INETDefs.h"
 #include "MACAddress.h"
 #include "ILifecycle.h"
+#include "LifecycleOperation.h"
 
 #define MAX_REPLY_CHUNK_SIZE   1497
 
@@ -28,7 +29,7 @@
 /**
  * Server-side process EtherAppCli.
  */
-class INET_API EtherAppSrv : public cSimpleModule, public LifecycleNotSupported
+class INET_API EtherAppSrv : public cSimpleModule, public ILifecycle
 {
   protected:
     int localSAP;
@@ -39,6 +40,10 @@ class INET_API EtherAppSrv : public cSimpleModule, public LifecycleNotSupported
     long packetsReceived;
     static simsignal_t sentPkSignal;
     static simsignal_t rcvdPkSignal;
+
+  public:
+    virtual bool handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+    { throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName()); return true; }
 
   protected:
     virtual void initialize();
