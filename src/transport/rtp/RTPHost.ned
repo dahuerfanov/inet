@@ -50,8 +50,8 @@ module RTPHost extends StandardHost
         rtcp.udpOut --> udp.appIn++;
         rtcp.udpIn <-- udp.appOut++;
 
-        networkLayer.udpOut --> udp.ipIn;
-        networkLayer.udpIn <-- udp.ipOut;
+        networkLayer.transportOut++ --> udp.ipIn;
+        networkLayer.transportIn++ <-- udp.ipOut;
 
         rtp.rtcpOut --> IdealChannel --> rtcp.rtpIn;
         rtcp.rtpOut --> IdealChannel --> rtp.rtcpIn;
