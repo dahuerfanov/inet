@@ -15,8 +15,8 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef __INET_IP_H
-#define __INET_IP_H
+#ifndef __INET_IPv4_H
+#define __INET_IPv4_H
 
 #include <omnetpp.h>
 #include "INETDefs.h"
@@ -35,6 +35,7 @@ class ARPPacket;
 class ICMPMessage;
 class IInterfaceTable;
 class IIPv4RoutingTable;
+class IARPCache;
 
 // ICMP type 2, code 4: fragmentation needed, but don't-fragment bit set
 const int ICMP_FRAGMENTATION_ERROR_CODE = 4;
@@ -65,8 +66,12 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
   protected:
     IIPv4RoutingTable *rt;
     IInterfaceTable *ift;
+    IARPCache *arp;
     ICMPAccess icmpAccess;
-    cGate *queueOutGate; // the most frequently used output gate
+    cGate *arpInGate;
+    cGate *arpOutGate;
+    int transportInGateBaseId;
+    int queueOutGateBaseId;
 
     // config
     int defaultTimeToLive;
@@ -96,7 +101,7 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
 
   protected:
     // utility: look up interface from getArrivalGate()
-    virtual const InterfaceEntry *getSourceInterfaceFrom(cPacket *msg);
+    virtual const InterfaceEntry *getSourceInterfaceFrom(cPacket *packet);
 
     // utility: look up route to the source of the datagram and return its interface
     virtual const InterfaceEntry *getShortestPathInterfaceToSource(IPv4Datagram *datagram);
@@ -120,7 +125,7 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      * Handle IPv4Datagram messages arriving from lower layer.
      * Decrements TTL, then invokes routePacket().
      */
-    virtual void handlePacketFromNetwork(IPv4Datagram *datagram, const InterfaceEntry *fromIE);
+    virtual void handleIncomingDatagram(IPv4Datagram *datagram, const InterfaceEntry *fromIE);
 
     // called after PREROUTING Hook (used for reinject, too)
     virtual void preroutingFinish(IPv4Datagram *datagram, const InterfaceEntry *fromIE, const InterfaceEntry *destIE, IPv4Address nextHopAddr);
@@ -129,7 +134,12 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      * Handle messages (typically packets to be send in IPv4) from transport or ICMP.
      * Invokes encapsulate(), then routePacket().
      */
-    virtual void handleMessageFromHL(cPacket *msg);
+    virtual void handlePacketFromHL(cPacket *packet);
+
+    /**
+     * TODO
+     */
+    virtual void handlePacketFromARP(cPacket *packet);
 
     /**
      * Routes and sends datagram received from higher layers.
@@ -138,14 +148,14 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
     virtual void datagramLocalOut(IPv4Datagram* datagram, const InterfaceEntry* destIE, IPv4Address nextHopAddr);
 
     /**
-     * Handle incoming ARP packets by sending them over "queueOut" to ARP.
+     * Handle incoming ARP packets by sending them over to ARP.
      */
-    virtual void handleARP(ARPPacket *msg);
+    virtual void handleIncomingARPPacket(ARPPacket *packet, const InterfaceEntry *fromIE);
 
     /**
      * Handle incoming ICMP messages.
      */
-    virtual void handleReceivedICMP(ICMPMessage *msg);
+    virtual void handleIncomingICMP(ICMPMessage *packet);
 
     /**
      * Performs unicast routing. Based on the routing decision, it sends the
@@ -198,12 +208,18 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
     virtual void fragmentAndSend(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr);
 
     /**
-     * Last TTL check, then send datagram on the given interface.
+     * Send datagram on the given interface.
      */
     virtual void sendDatagramToOutput(IPv4Datagram *datagram, const InterfaceEntry *ie, IPv4Address nextHopAddr);
 
+    virtual MACAddress resolveNextHopMacAddress(cPacket *packet, IPv4Address nextHopAddr, const InterfaceEntry *destIE);
+
+    virtual void sendPacketToIeee802NIC(cPacket *packet, const InterfaceEntry *ie, const MACAddress& macAddress, int etherType);
+
+    virtual void sendPacketToNIC(cPacket *packet, const InterfaceEntry *ie);
+
   public:
-    IPv4() { rt = NULL; ift = NULL; queueOutGate = NULL; }
+    IPv4() { rt = NULL; ift = NULL; arp = NULL; arpOutGate = NULL; }
 
   protected:
     /**
@@ -220,7 +236,7 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      * Processing of IPv4 datagrams. Called when a datagram reaches the front
      * of the queue.
      */
-    virtual void endService(cPacket *msg);
+    virtual void endService(cPacket *packet);
 
     // NetFilter functions:
   protected:
