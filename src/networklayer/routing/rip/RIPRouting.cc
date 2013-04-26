@@ -196,7 +196,7 @@ void RIPRouting::receiveChangeNotification(int category, const cObject *details)
         case NF_INTERFACE_STATE_CHANGED:
             // if the interface is down, invalidate routes via that interface
             ie = const_cast<InterfaceEntry*>(check_and_cast<const InterfaceEntry*>(details));
-            if (ie->isDown())
+            if (!ie->isUp())
                 invalidateRoutes(ie);
             break;
         case NF_ROUTE_DELETED:
