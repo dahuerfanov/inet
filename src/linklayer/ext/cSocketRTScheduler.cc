@@ -280,6 +280,10 @@ cEvent *cSocketRTScheduler::guessNextEvent()
 {
     return sim->msgQueue.peekFirst();
 }
+void cSocketRTScheduler::putBackEvent(cEvent *event)
+{
+    sim->msgQueue.putBackFirst(event);
+}
 cEvent *cSocketRTScheduler::takeNextEvent()
 #else
 cMessage *cSocketRTScheduler::getNextEvent()
