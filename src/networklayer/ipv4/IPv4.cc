@@ -78,29 +78,6 @@ void IPv4::initialize(int stage)
         WATCH(numDropped);
         WATCH(numUnroutable);
         WATCH(numForwarded);
-
-#ifdef WITH_MANET
-        // test for the presence of MANET routing
-        // check if there is a protocol -> gate mapping
-        int gateindex = mapping.getOutputGateForProtocol(IP_PROT_MANET);
-        if (gateSize("transportOut")-1<gateindex)
-            return;
-
-        // check if that gate is connected at all
-        cGate *manetgate = gate("transportOut", gateindex)->getPathEndGate();
-        if (manetgate==NULL)
-            return;
-
-        cModule *destmod = manetgate->getOwnerModule();
-        if (destmod==NULL)
-            return;
-
-        // manet routing will be turned on ONLY for routing protocols which has the @reactive property set
-        // this prevents performance loss with other protocols that use pro active routing and do not need
-        // assistance from the IPv4 component
-        cProperties *props = destmod->getProperties();
-        manetRouting = props && props->getAsBool("reactive");
-#endif
     }
     else if (stage == 1)
     {
