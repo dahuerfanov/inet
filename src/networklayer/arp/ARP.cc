@@ -93,7 +93,6 @@ void ARP::initialize(int stage)
         pendingQueue.setName("pendingQueue");
 
         isUp = isNodeUp();
-        ipOutGate = gate("ipOut");
         netwOutGate = gate("netwOut");
 
         // init statistics

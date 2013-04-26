@@ -29,7 +29,7 @@ bool ModulePathAddress::tryParse(const char *addr)
     }
     if (module) {
         // accepts network interface modules only:
-        if (isNode(module))
+        if (isNetworkNode(module))
             return false;
         IInterfaceTable *ift = InterfaceTableAccess().get(module);
         if (ift == NULL)

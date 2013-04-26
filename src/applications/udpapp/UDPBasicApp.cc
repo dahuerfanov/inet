@@ -44,7 +44,7 @@ void UDPBasicApp::initialize(int stage)
 {
     AppBase::initialize(stage);
 
-    // because of IPvXAddressResolver, we need to wait until interfaces are registered,
+    // because of AddressResolver, we need to wait until interfaces are registered,
     // address auto-assignment takes place etc.
     if (stage == 0)
     {
@@ -139,7 +139,7 @@ void UDPBasicApp::processStart()
     const char *token;
 
     while ((token = tokenizer.nextToken()) != NULL)
-        destAddresses.push_back(IPvXAddressResolver().resolve(token));
+        destAddresses.push_back(AddressResolver().resolve(token));
 
     if (!destAddresses.empty())
     {

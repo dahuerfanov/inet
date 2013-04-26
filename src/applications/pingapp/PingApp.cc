@@ -147,7 +147,7 @@ void PingApp::stopSendingPingRequests()
     pid = -1;
     lastStart = -1;
     sendSeqNo = expectedReplySeqNo = 0;
-    srcAddr = destAddr = IPvXAddress();
+    srcAddr = destAddr = Address();
     cancelNextPingRequest();
 }
 
@@ -181,8 +181,8 @@ void PingApp::sendPingRequest()
 {
     if (destAddr.isUnspecified())
     {
-        srcAddr = IPvXAddressResolver().resolve(par("srcAddr"));
-        destAddr = IPvXAddressResolver().resolve(par("destAddr"));
+        srcAddr = AddressResolver().resolve(par("srcAddr"));
+        destAddr = AddressResolver().resolve(par("destAddr"));
         EV << "Starting up: destination = " << destAddr << "  source = " << srcAddr << "\n";
     }
 
@@ -246,8 +246,6 @@ void PingApp::processPingResponse(PingPayload *msg)
     }
 
     // get src, hopCount etc from packet, and print them
-    ASSERT(msg->getOriginatorId() == getId());  // ICMP module error
-
     INetworkProtocolControlInfo *ctrl = check_and_cast<INetworkProtocolControlInfo *>(msg->getControlInfo());
     Address src = ctrl->getSourceAddress();
     Address dest = ctrl->getDestinationAddress();

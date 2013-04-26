@@ -869,7 +869,7 @@ void IPv4RoutingTable::updateNetmaskRoutes()
     updateDisplayString();
 }
 
-bool RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool IPv4RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
     if (dynamic_cast<NodeStartOperation *>(operation)) {

@@ -818,7 +818,7 @@ bool IPv6RoutingTable::isOnLinkAddress(const IPv6Address& address)
 
 #endif /* WITH_xMIPv6 */
 
-bool RoutingTable6::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
+bool IPv6RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
     if (dynamic_cast<NodeStartOperation *>(operation)) {

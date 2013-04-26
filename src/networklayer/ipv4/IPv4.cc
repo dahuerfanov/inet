@@ -48,7 +48,7 @@ void IPv4::initialize(int stage)
         QueueBase::initialize();
 
         ift = InterfaceTableAccess().get();
-        rt = check_and_cast<IIPv4RoutingTable *>(findModuleWhereverInNode(par("routingTableModuleName"), this));
+        rt = check_and_cast<IIPv4RoutingTable *>(getModuleByPath(par("routingTableModule")));
         arp = ARPCacheAccess().get();
 
         arpDgramOutGate = gate("arpDgramOut");
@@ -56,8 +56,6 @@ void IPv4::initialize(int stage)
         arpOutGate = gate("arpOut");
         transportInGateBaseId = gateBaseId("transportIn");
         queueOutGateBaseId = gateBaseId("queueOut");
-
-        queueOutGate = gate("queueOut");
 
         defaultTimeToLive = par("timeToLive");
         defaultMCTimeToLive = par("multicastTimeToLive");
@@ -136,7 +134,7 @@ void IPv4::endService(cPacket *packet)
 {
     if (!isUp) {
         EV << "IPv4 is down -- discarding message\n";
-        delete msg;
+        delete packet;
         return;
     }
     if (packet->getArrivalGate()->isName("transportIn")) //TODO packet->getArrivalGate()->getBaseId() == transportInGateBaseId

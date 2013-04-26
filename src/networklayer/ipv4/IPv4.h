@@ -224,14 +224,8 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
     IPv4() { rt = NULL; ift = NULL; arp = NULL; arpOutGate = NULL; }
 
   protected:
-    /**
-     * Initialization
-     */
-    virtual void initialize();
-
-    /**
-     * Handle message.
-     */
+    virtual int numInitStages() const {return 2;}
+    virtual void initialize(int stage);
     virtual void handleMessage(cMessage *msg);
 
     /**
@@ -273,10 +267,6 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      */
     virtual void registerHook(int priority, IHook* hook);
 
-  protected:
-    virtual int numInitStages() const {return 2;}
-    virtual void initialize(int stage);
-
     /**
      * unregisters a Hook to be executed during datagram processing
      */
@@ -285,18 +275,6 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
     /**
      * drop a previously queued datagram
      */
-    virtual void endService(cPacket *msg);
-
-    /**
-     * ILifecycle method
-     */
-    virtual bool handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback);
-
-    virtual bool isNodeUp();
-    virtual void stop();
-    virtual void start();
-    virtual void flush();
-
     void dropQueuedDatagram(const INetworkDatagram * datagram);
 
     /**
@@ -308,6 +286,17 @@ class INET_API IPv4 : public QueueBase, public INetfilter, public ILifecycle
      * send packet on transportOut gate specified by protocolId
      */
     void sendOnTransPortOutGateByProtocolId(cPacket *packet, int protocolId);
+
+    /**
+     * ILifecycle method
+     */
+    virtual bool handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback);
+
+  protected:
+    virtual bool isNodeUp();
+    virtual void stop();
+    virtual void start();
+    virtual void flush();
 };
 
 #endif
