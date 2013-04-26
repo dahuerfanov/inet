@@ -1,4 +1,5 @@
 # ignore generated files
+.cmdenv-log
 *_m.h
 *_m.cc
 *_sm.h
