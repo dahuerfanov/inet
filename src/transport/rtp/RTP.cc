@@ -23,7 +23,7 @@
 #include "LifecycleOperation.h"
 #include "NodeOperations.h"
 #include "NodeStatus.h"
-#include "RoutingTableAccess.h"
+#include "IPv4RoutingTableAccess.h"
 #include "RTPInnerPacket.h"
 #include "RTPInterfacePacket_m.h"
 #include "RTPProfile.h"
@@ -375,7 +375,7 @@ int RTP::resolveMTU()
     // it returns MTU bytelength (ethernet) minus ip
     // and udp headers
     // TODO: How to do get the valid length of IP and ETHERNET header?
-    RoutingTableAccess routingTableAccess;
+    IPv4RoutingTableAccess routingTableAccess;
     const InterfaceEntry* rtie = routingTableAccess.get()->getInterfaceForDestAddr(_destinationAddress);
 
     if (rtie == NULL)

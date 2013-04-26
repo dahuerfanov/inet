@@ -21,7 +21,7 @@
 
 #include "InterfaceEntry.h"
 #include "IInterfaceTable.h"
-#include "IPvXAddressResolver.h"
+#include "AddressResolver.h"
 #include "PingPayload_m.h"
 
 #ifdef WITH_IPv4
@@ -108,7 +108,7 @@ void PingTestApp::handleMessage(cMessage *msg)
 
                 while ((token = tokenizer.nextToken()) != NULL)
                 {
-                    IPvXAddress addr = IPvXAddressResolver().resolve(token);
+                    Address addr = AddressResolver().resolve(token);
                     destAddresses.push_back(addr);
                 }
             }
@@ -143,9 +143,9 @@ void PingTestApp::handleMessage(cMessage *msg)
     }
 }
 
-std::vector<IPvXAddress> PingTestApp::getAllAddresses()
+std::vector<Address> PingTestApp::getAllAddresses()
 {
-    std::vector<IPvXAddress> result;
+    std::vector<Address> result;
 
     for (int i=0; i<=simulation.getLastModuleId(); i++)
     {
@@ -162,7 +162,7 @@ std::vector<IPvXAddress> PingTestApp::getAllAddresses()
                     {
                         IPv4Address address = ie->ipv4Data()->getIPAddress();
                         if (!address.isUnspecified())
-                            result.push_back(IPvXAddress(address));
+                            result.push_back(Address(address));
                     }
 #endif
 #ifdef WITH_IPv6
@@ -172,7 +172,7 @@ std::vector<IPvXAddress> PingTestApp::getAllAddresses()
                         {
                             IPv6Address address = ie->ipv6Data()->getAddress(k);
                             if (!address.isUnspecified() && address.isGlobal())
-                                result.push_back(IPvXAddress(address));
+                                result.push_back(Address(address));
                         }
                     }
 #endif
@@ -215,15 +215,15 @@ void PingTestApp::scheduleNextPing(cMessage *timer)
         delete timer;
 }
 
-void PingTestApp::sendToICMP(cMessage *msg, const IPvXAddress& destAddr, const IPvXAddress& srcAddr, int hopLimit)
+void PingTestApp::sendToICMP(cMessage *msg, const Address& destAddr, const Address& srcAddr, int hopLimit)
 {
     if (!destAddr.isIPv6())
     {
 #ifdef WITH_IPv4
         // send to IPv4
         IPv4ControlInfo *ctrl = new IPv4ControlInfo();
-        ctrl->setSrcAddr(srcAddr.get4());
-        ctrl->setDestAddr(destAddr.get4());
+        ctrl->setSrcAddr(srcAddr.toIPv4());
+        ctrl->setDestAddr(destAddr.toIPv4());
         ctrl->setTimeToLive(hopLimit);
         msg->setControlInfo(ctrl);
         send(msg, "pingOut");
@@ -236,8 +236,8 @@ void PingTestApp::sendToICMP(cMessage *msg, const IPvXAddress& destAddr, const I
 #ifdef WITH_IPv6
         // send to IPv6
         IPv6ControlInfo *ctrl = new IPv6ControlInfo();
-        ctrl->setSrcAddr(srcAddr.get6());
-        ctrl->setDestAddr(destAddr.get6());
+        ctrl->setSrcAddr(srcAddr.toIPv6());
+        ctrl->setDestAddr(destAddr.toIPv6());
         ctrl->setHopLimit(hopLimit);
         msg->setControlInfo(ctrl);
         send(msg, "pingv6Out");
@@ -250,7 +250,7 @@ void PingTestApp::sendToICMP(cMessage *msg, const IPvXAddress& destAddr, const I
 void PingTestApp::processPingResponse(PingPayload *msg)
 {
     // get src, hopCount etc from packet, and print them
-    IPvXAddress src, dest;
+    Address src, dest;
     int msgHopCount = -1;
 
     ASSERT(msg->getOriginatorId() == getId());  // ICMP module error

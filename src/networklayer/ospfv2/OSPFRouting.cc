@@ -25,7 +25,7 @@
 
 #include "MessageHandler.h"
 #include "OSPFConfigReader.h"
-#include "RoutingTableAccess.h"
+#include "IPv4RoutingTableAccess.h"
 #include "NodeOperations.h"
 #include "NodeStatus.h"
 

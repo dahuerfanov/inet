@@ -18,9 +18,8 @@
 
 
 #include "UDPBasicApp.h"
-
+#include "AddressResolver.h"
 #include "InterfaceTableAccess.h"
-#include "IPvXAddressResolver.h"
 #include "NodeOperations.h"
 #include "UDPControlInfo_m.h"
 
@@ -103,7 +102,7 @@ void UDPBasicApp::setSocketOptions()
         socket.joinLocalMulticastGroups();
 }
 
-IPvXAddress UDPBasicApp::chooseDestAddr()
+Address UDPBasicApp::chooseDestAddr()
 {
     int k = intrand(destAddresses.size());
     return destAddresses[k];
@@ -122,7 +121,7 @@ cPacket *UDPBasicApp::createPacket()
 void UDPBasicApp::sendPacket()
 {
     cPacket *payload = createPacket();
-    IPvXAddress destAddr = chooseDestAddr();
+    Address destAddr = chooseDestAddr();
 
     emit(sentPkSignal, payload);
     socket.sendTo(payload, destAddr, destPort);

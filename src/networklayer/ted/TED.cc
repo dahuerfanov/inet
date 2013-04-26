@@ -20,7 +20,7 @@
 #include "IPv4ControlInfo.h"
 #include "IPv4InterfaceData.h"
 #include "NotifierConsts.h"
-#include "RoutingTableAccess.h"
+#include "IPv4RoutingTableAccess.h"
 #include "InterfaceTableAccess.h"
 #include "NotificationBoard.h"
 #include "NodeOperations.h"
@@ -45,7 +45,7 @@ void TED::initialize(int stage)
     if (stage!=4)
         return;
 
-    rt = RoutingTableAccess().get();
+    rt = IPv4RoutingTableAccess().get();
     ift = InterfaceTableAccess().get();
     routerId = rt->getRouterId();
     nb = NotificationBoardAccess().get();
@@ -100,7 +100,7 @@ void TED::initializeTED()
         }
         if (!g)     // not connected
             continue;
-        IRoutingTable *destRt = RoutingTableAccess().get(destNode);
+        IIPv4RoutingTable *destRt = IPv4RoutingTableAccess().get(destNode);
         if (!destRt)    // switch, hub, bus, accesspoint, etc
             continue;
         IPv4Address destRouterId = destRt->getRouterId();

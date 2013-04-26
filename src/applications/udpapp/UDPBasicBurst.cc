@@ -22,7 +22,7 @@
 #include "UDPBasicBurst.h"
 
 #include "UDPControlInfo_m.h"
-#include "IPvXAddressResolver.h"
+#include "AddressResolver.h"
 #include "IRoutingTable.h"
 #include "RoutingTableAccess.h"
 #include "RoutingTable6.h"
@@ -155,7 +155,7 @@ void UDPBasicBurst::processStart()
             destAddresses.push_back(IPv4Address::ALLONES_ADDRESS);
         else
         {
-            IPvXAddress addr = IPvXAddressResolver().resolve(token);
+            Address addr = AddressResolver().resolve(token);
 #ifdef WITH_IPv4
             if (excludeLocalDestAddresses && rt && rt->isLocalAddress(addr.get4()))
                 continue;
