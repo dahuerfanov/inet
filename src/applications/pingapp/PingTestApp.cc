@@ -95,7 +95,7 @@ void PingTestApp::handleMessage(cMessage *msg)
     {
         if (sendSeqNo == 0)
         {
-            srcAddr = IPvXAddressResolver().resolve(par("srcAddr"));
+            srcAddr = AddressResolver().resolve(par("srcAddr"));
             const char *destAddrs = par("destAddresses");
             if (!strcmp(destAddrs, "*"))
             {
