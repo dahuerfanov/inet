@@ -68,8 +68,7 @@ void InterfaceTable::initialize(int stage)
         // get a pointer to the NotificationBoard module
         nb = NotificationBoardAccess().get();
         NodeStatus *nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
-        if (!nodeStatus || nodeStatus->getState() == NodeStatus::UP)
-            registerLoopbackInterface();
+        registerLoopbackInterface();
     }
     else if (stage==1)
     {
@@ -378,33 +377,8 @@ InterfaceEntry *InterfaceTable::getFirstMulticastInterface()
 bool InterfaceTable::handleOperationStage(LifecycleOperation *operation, int stage, IDoneCallback *doneCallback)
 {
     Enter_Method_Silent();
-    if (dynamic_cast<NodeStartOperation *>(operation)) {
-        if (stage == NodeStartOperation::STAGE_LINK_LAYER)
-            registerLoopbackInterface();
-    }
-    else if (dynamic_cast<NodeShutdownOperation *>(operation)) {
-        if (stage == NodeShutdownOperation::STAGE_LINK_LAYER) {
-            for (int i = 0; i < (int)idToInterface.size(); i++) {
-                InterfaceEntry *ie = idToInterface[i];
-                if (ie) {
-                    deleteInterface(ie);   //TODO aki betette, az szedje ki? es tunnel eseten?? egyelore jo igy
-                    if (ie->getInterfaceModule())
-                        ie->getInterfaceModule()->getDisplayString().removeTag("i2");
-                }
-            }
-        }
-    }
-    else if (dynamic_cast<NodeCrashOperation *>(operation)) {
-        if (stage == NodeCrashOperation::STAGE_CRASH) {
-            for (int i = 0; i < (int)idToInterface.size(); i++) {
-                InterfaceEntry *ie = idToInterface[i];
-                if (ie) {
-                    deleteInterface(ie);   //TODO aki betette, az szedje ki? es tunnel eseten?? egyelore jo igy
-                    if (ie->getInterfaceModule())
-                        ie->getInterfaceModule()->getDisplayString().removeTag("i2");
-                }
-            }
-        }
-    }
+    if (dynamic_cast<NodeStartOperation *>(operation)) ;
+    else if (dynamic_cast<NodeShutdownOperation *>(operation)) ;
+    else if (dynamic_cast<NodeCrashOperation *>(operation)) ;
     return true;
 }
