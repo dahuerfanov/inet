@@ -873,7 +873,7 @@ bool RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage
                 configureInterfaceForIPv4(ie);
                 // KLUDGE: TODO: move or what?
                 if (configurator)
-                    configurator->assignAddress(ie);
+                    configurator->configureInterface(ie);
             }
             configureLoopbackForIPv4();
             RoutingTableParser parser(ift, this);
@@ -883,7 +883,7 @@ bool RoutingTable::handleOperationStage(LifecycleOperation *operation, int stage
             configureRouterId();
             // KLUDGE: TODO: move or what?
             if (configurator)
-                configurator->addStaticRoutes(this);
+                configurator->configureRoutingTable(this);
             updateNetmaskRoutes();
         }
     }
